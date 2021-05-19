@@ -119,6 +119,14 @@ public class SimpleReactiveAerospikeRepository<T, ID> implements ReactiveAerospi
     }
 
     @Override
+    public Mono<Void> deleteAllById(Iterable<? extends ID> iterable) {
+        Assert.notNull(iterable, "The given Iterable must not be null!");
+        iterable.forEach(id ->
+                Assert.notNull(id, "The given Iterable of entities must not contain null!"));
+        return Flux.fromIterable(iterable).flatMap(this::deleteById).then();
+    }
+
+    @Override
     public Mono<Void> deleteAll(Iterable<? extends T> entities) {
         Assert.notNull(entities, "The given Iterable of entities must not be null!");
         entities.forEach(entity ->
