@@ -46,6 +46,7 @@ public class QueryEngine {
 
 	private final IAerospikeClient client;
 	private final StatementBuilder statementBuilder;
+	private final FilterExpressionsBuilder filterExpressionsBuilder;
 	private final QueryPolicy queryPolicy;
 
 	public enum Meta {
@@ -70,9 +71,10 @@ public class QueryEngine {
 	}
 
 	public QueryEngine(IAerospikeClient client, StatementBuilder statementBuilder,
-					   QueryPolicy queryPolicy) {
+					   FilterExpressionsBuilder filterExpressionsBuilder, QueryPolicy queryPolicy) {
 		this.client = client;
 		this.statementBuilder = statementBuilder;
+		this.filterExpressionsBuilder = filterExpressionsBuilder;
 		this.queryPolicy = queryPolicy;
 	}
 
@@ -106,14 +108,20 @@ public class QueryEngine {
 		 *  query with filters
 		 */
 		Statement statement = statementBuilder.build(namespace, set, filter, qualifiers);
-		if(!scansEnabled && statement.getFilter() == null) {
+		QueryPolicy localQueryPolicy = new QueryPolicy(queryPolicy);
+		localQueryPolicy.filterExp = filterExpressionsBuilder.build(qualifiers);
+		if (!scansEnabled && statement.getFilter() == null) {
 			throw new IllegalStateException(SCANS_DISABLED_MESSAGE);
 		}
-		RecordSet rs = client.query(queryPolicy, statement);
+		RecordSet rs = client.query(localQueryPolicy, statement);
 		return new KeyRecordIterator(namespace, rs);
 	}
 
 	public void setScansEnabled(boolean scansEnabled) {
 		this.scansEnabled = scansEnabled;
+	}
+
+	public QueryPolicy getQueryPolicy() {
+		return queryPolicy;
 	}
 }

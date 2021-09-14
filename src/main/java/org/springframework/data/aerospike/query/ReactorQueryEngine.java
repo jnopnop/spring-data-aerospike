@@ -43,12 +43,14 @@ public class ReactorQueryEngine {
 
 	private final IAerospikeReactorClient client;
 	private final StatementBuilder statementBuilder;
+	private final FilterExpressionsBuilder filterExpressionsBuilder;
 	private final QueryPolicy queryPolicy;
 
 	public ReactorQueryEngine(IAerospikeReactorClient client, StatementBuilder statementBuilder,
-							  QueryPolicy queryPolicy) {
+							  FilterExpressionsBuilder filterExpressionsBuilder, QueryPolicy queryPolicy) {
 		this.client = client;
 		this.statementBuilder = statementBuilder;
+		this.filterExpressionsBuilder = filterExpressionsBuilder;
 		this.queryPolicy = queryPolicy;
 	}
 
@@ -72,18 +74,20 @@ public class ReactorQueryEngine {
 			return Flux.from(this.client.get(null, key))
 					.filter(keyRecord -> Objects.nonNull(keyRecord.record));
 		}
+
 		/*
 		 *  query with filters
 		 */
 		Statement statement = statementBuilder.build(namespace, set, filter, qualifiers);
-		if(!scansEnabled && statement.getFilter() == null) {
+		QueryPolicy localQueryPolicy = new QueryPolicy(queryPolicy);
+		localQueryPolicy.filterExp = filterExpressionsBuilder.build(qualifiers);
+		if (!scansEnabled && statement.getFilter() == null) {
 			return Flux.error(new IllegalStateException(QueryEngine.SCANS_DISABLED_MESSAGE));
 		}
-		return client.query(queryPolicy, statement);
+		return client.query(localQueryPolicy, statement);
 	}
 
 	public void setScansEnabled(boolean scansEnabled) {
 		this.scansEnabled = scansEnabled;
 	}
-
 }
