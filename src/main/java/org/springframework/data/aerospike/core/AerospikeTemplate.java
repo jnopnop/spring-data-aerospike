@@ -149,7 +149,7 @@ public class AerospikeTemplate extends BaseAerospikeTemplate implements Aerospik
 
 			doPersistWithVersionAndHandleCasError(document, data, policy);
 		} else {
-			WritePolicy policy = ignoreGenerationSavePolicy(data, RecordExistsAction.REPLACE);
+			WritePolicy policy = ignoreGenerationSavePolicy(data, RecordExistsAction.UPDATE);
 
 			doPersistAndHandleError(data, policy);
 		}
@@ -594,9 +594,10 @@ public class AerospikeTemplate extends BaseAerospikeTemplate implements Aerospik
 
 	private void put(AerospikeWriteData data, WritePolicy policy) {
 		Key key = data.getKey();
-		Bin[] bins = data.getBinsAsArray();
+		Operation[] ops = Stream.concat(Stream.of(Operation.delete()), data.getBins().stream().map(Operation::put))
+				.toArray(Operation[]::new);
 
-		client.put(policy, key, bins);
+		client.operate(policy, key, ops);
 	}
 
 	private Record putAndGetHeader(AerospikeWriteData data, WritePolicy policy) {
