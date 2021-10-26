@@ -20,7 +20,12 @@ import com.aerospike.client.*;
 import com.aerospike.client.cluster.Node;
 import com.aerospike.client.policy.RecordExistsAction;
 import com.aerospike.client.policy.WritePolicy;
-import com.aerospike.client.query.*;
+import com.aerospike.client.query.Filter;
+import com.aerospike.client.query.IndexCollectionType;
+import com.aerospike.client.query.IndexType;
+import com.aerospike.client.query.KeyRecord;
+import com.aerospike.client.query.ResultSet;
+import com.aerospike.client.query.Statement;
 import com.aerospike.client.task.IndexTask;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.aerospike.convert.AerospikeWriteData;
@@ -40,7 +45,13 @@ import org.springframework.data.keyvalue.core.IterableConverter;
 import org.springframework.data.util.StreamUtils;
 import org.springframework.util.Assert;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -200,7 +211,10 @@ public class AerospikeTemplate extends BaseAerospikeTemplate implements Aerospik
 
 			doPersistWithVersionAndHandleCasError(document, data, policy);
 		} else {
-			WritePolicy policy = ignoreGenerationSavePolicy(data, RecordExistsAction.REPLACE_ONLY);
+			if(!client.exists(writePolicyDefault, data.getKey())) {
+				throw new AerospikeException("Document does not exist");
+			}
+			WritePolicy policy = ignoreGenerationSavePolicy(data, RecordExistsAction.UPDATE);
 
 			doPersistAndHandleError(data, policy);
 		}

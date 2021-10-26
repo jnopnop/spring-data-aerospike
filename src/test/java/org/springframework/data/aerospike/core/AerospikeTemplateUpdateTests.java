@@ -15,11 +15,11 @@
  */
 package org.springframework.data.aerospike.core;
 
+import com.aerospike.client.AerospikeException;
 import com.aerospike.client.Key;
 import com.aerospike.client.Record;
 import com.aerospike.client.policy.Policy;
 import org.junit.jupiter.api.Test;
-import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.aerospike.AsyncUtils;
 import org.springframework.data.aerospike.BaseBlockingIntegrationTests;
@@ -40,7 +40,7 @@ public class AerospikeTemplateUpdateTests extends BaseBlockingIntegrationTests {
     @Test
     public void shouldThrowExceptionOnUpdateForNonExistingKey() {
         assertThatThrownBy(() -> template.update(new Person(id, "svenfirstName", 11)))
-                .isInstanceOf(DataRetrievalFailureException.class);
+                .isInstanceOf(AerospikeException.class);
     }
 
     @Test

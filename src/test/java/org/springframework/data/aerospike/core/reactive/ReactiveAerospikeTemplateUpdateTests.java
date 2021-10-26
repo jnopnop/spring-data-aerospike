@@ -3,7 +3,6 @@ package org.springframework.data.aerospike.core.reactive;
 import com.aerospike.client.Key;
 import com.aerospike.client.policy.Policy;
 import org.junit.jupiter.api.Test;
-import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.aerospike.AsyncUtils;
 import org.springframework.data.aerospike.BaseReactiveIntegrationTests;
@@ -22,7 +21,7 @@ public class ReactiveAerospikeTemplateUpdateTests extends BaseReactiveIntegratio
     @Test
     public void shouldThrowExceptionOnUpdateForNonexistingKey() {
         create(reactiveTemplate.update(new Person(id, "svenfirstName", 11)))
-                .expectError(DataRetrievalFailureException.class)
+                .expectError(Exception.class)
                 .verify();
     }
 

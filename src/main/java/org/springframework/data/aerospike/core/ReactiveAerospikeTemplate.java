@@ -15,8 +15,12 @@
  */
 package org.springframework.data.aerospike.core;
 
+import com.aerospike.client.AerospikeException;
+import com.aerospike.client.Bin;
+import com.aerospike.client.Key;
+import com.aerospike.client.Operation;
 import com.aerospike.client.Record;
-import com.aerospike.client.*;
+import com.aerospike.client.Value;
 import com.aerospike.client.cluster.Node;
 import com.aerospike.client.policy.RecordExistsAction;
 import com.aerospike.client.policy.WritePolicy;
@@ -43,8 +47,13 @@ import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import static com.aerospike.client.ResultCode.KEY_NOT_FOUND_ERROR;
 import static java.util.Objects.nonNull;
@@ -88,9 +97,14 @@ public class ReactiveAerospikeTemplate extends BaseAerospikeTemplate implements 
 
             return doPersistWithVersionAndHandleCasError(document, data, policy);
         } else {
-            WritePolicy policy = ignoreGenerationSavePolicy(data, RecordExistsAction.REPLACE);
+            WritePolicy policy = ignoreGenerationSavePolicy(data, RecordExistsAction.UPDATE);
 
-            return doPersistAndHandleError(document, data, policy);
+            Operation[] ops = Stream.concat(Stream.of(Operation.delete()), data.getBins().stream().map(Operation::put))
+                    .toArray(Operation[]::new);
+            return reactorClient
+                    .operate(policy, data.getKey(), ops)
+                    .map(docKey -> document)
+                    .onErrorMap(this::translateError);
         }
     }
 
@@ -129,9 +143,16 @@ public class ReactiveAerospikeTemplate extends BaseAerospikeTemplate implements 
 
             return doPersistWithVersionAndHandleCasError(document, data, policy);
         } else {
-            WritePolicy policy = ignoreGenerationSavePolicy(data, RecordExistsAction.REPLACE_ONLY);
+            WritePolicy policy = ignoreGenerationSavePolicy(data, RecordExistsAction.UPDATE);
 
-            return doPersistAndHandleError(document, data, policy);
+            Operation[] ops = Stream.concat(Stream.of(Operation.delete()), data.getBins().stream().map(Operation::put))
+                    .toArray(Operation[]::new);
+            return reactorClient
+                    .exists(data.getKey())
+                    .switchIfEmpty(Mono.error(new AerospikeException("Document does not exist")))
+                    .flatMap(key -> reactorClient.operate(policy, key, ops))
+                    .map(docKey -> document)
+                    .onErrorMap(this::translateError);
         }
     }
 
