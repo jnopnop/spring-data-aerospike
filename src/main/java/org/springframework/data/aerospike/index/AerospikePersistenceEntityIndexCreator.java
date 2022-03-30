@@ -18,6 +18,7 @@
 package org.springframework.data.aerospike.index;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.aerospike.IndexAlreadyExistsException;
 import org.springframework.data.aerospike.core.AerospikeTemplate;
 import org.springframework.data.aerospike.mapping.AerospikeMappingContext;
@@ -32,10 +33,11 @@ public class AerospikePersistenceEntityIndexCreator extends BaseAerospikePersist
 
     private final AerospikeTemplate template;
 
-    public AerospikePersistenceEntityIndexCreator(boolean createIndexesOnStartup,
+    public AerospikePersistenceEntityIndexCreator(ObjectProvider<AerospikeMappingContext> mappingContext,
+                                                  boolean createIndexesOnStartup,
                                                   AerospikeIndexResolver aerospikeIndexResolver,
                                                   AerospikeTemplate template) {
-        super(createIndexesOnStartup, aerospikeIndexResolver);
+        super(mappingContext, createIndexesOnStartup, aerospikeIndexResolver);
         this.template = template;
     }
 

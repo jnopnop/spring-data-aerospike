@@ -26,7 +26,7 @@ class ReactiveAerospikePersistenceEntityIndexCreatorTest {
     ReactiveAerospikeTemplate template = mock(ReactiveAerospikeTemplate.class);
 
     ReactiveAerospikePersistenceEntityIndexCreator creator =
-            new ReactiveAerospikePersistenceEntityIndexCreator(createIndexesOnStartup, aerospikeIndexResolver, template);
+            new ReactiveAerospikePersistenceEntityIndexCreator(null, createIndexesOnStartup, aerospikeIndexResolver, template);
 
     String name = "someName";
     String fieldName = "fieldName";

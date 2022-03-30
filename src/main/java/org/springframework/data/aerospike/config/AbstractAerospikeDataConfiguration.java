@@ -16,6 +16,7 @@
 package org.springframework.data.aerospike.config;
 
 import com.aerospike.client.IAerospikeClient;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -56,9 +57,10 @@ public abstract class AbstractAerospikeDataConfiguration extends AerospikeDataCo
     }
 
     @Bean
-    public AerospikePersistenceEntityIndexCreator aerospikePersistenceEntityIndexCreator(AerospikeIndexResolver aerospikeIndexResolver,
+    public AerospikePersistenceEntityIndexCreator aerospikePersistenceEntityIndexCreator(ObjectProvider<AerospikeMappingContext> aerospikeMappingContext,
+                                                                                         AerospikeIndexResolver aerospikeIndexResolver,
                                                                                          @Lazy AerospikeTemplate template) {
-        return new AerospikePersistenceEntityIndexCreator(aerospikeDataSettings().isCreateIndexesOnStartup(), aerospikeIndexResolver, template);
+        return new AerospikePersistenceEntityIndexCreator(aerospikeMappingContext, aerospikeDataSettings().isCreateIndexesOnStartup(), aerospikeIndexResolver, template);
     }
 
     @Bean(name = "aerospikeIndexRefresher")

@@ -27,7 +27,7 @@ class AerospikePersistenceEntityIndexCreatorTest {
     AerospikeTemplate template = mock(AerospikeTemplate.class);
 
     AerospikePersistenceEntityIndexCreator creator =
-            new AerospikePersistenceEntityIndexCreator(createIndexesOnStartup, aerospikeIndexResolver, template);
+            new AerospikePersistenceEntityIndexCreator(null, createIndexesOnStartup, aerospikeIndexResolver, template);
 
     String name = "someName";
     String fieldName = "fieldName";
