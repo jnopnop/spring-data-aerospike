@@ -28,6 +28,7 @@ import org.springframework.data.aerospike.convert.AerospikeTypeAliasAccessor;
 import org.springframework.data.aerospike.convert.MappingAerospikeConverter;
 import org.springframework.data.aerospike.core.AerospikeExceptionTranslator;
 import org.springframework.data.aerospike.core.DefaultAerospikeExceptionTranslator;
+import org.springframework.data.aerospike.index.AerospikeIndexResolver;
 import org.springframework.data.aerospike.mapping.AerospikeMappingContext;
 import org.springframework.data.aerospike.mapping.AerospikeSimpleTypes;
 import org.springframework.data.aerospike.mapping.Document;
@@ -86,7 +87,6 @@ public abstract class AerospikeDataConfigurationSupport {
         context.setInitialEntitySet(getInitialEntitySet());
         context.setSimpleTypeHolder(AerospikeSimpleTypes.HOLDER);
         context.setFieldNamingStrategy(fieldNamingStrategy());
-        context.setCreateIndexesOnStartup(isCreateIndexesOnStartup());
         return context;
     }
 
@@ -104,6 +104,12 @@ public abstract class AerospikeDataConfigurationSupport {
     @Bean(name = "filterExpressionsBuilder")
     public FilterExpressionsBuilder filterExpressionsBuilder() {
         return new FilterExpressionsBuilder();
+    }
+
+
+    @Bean(name = "aerospikeIndexResolver")
+    public AerospikeIndexResolver aerospikeIndexResolver() {
+        return new AerospikeIndexResolver();
     }
 
     protected Set<Class<?>> getInitialEntitySet() throws ClassNotFoundException {
@@ -147,6 +153,7 @@ public abstract class AerospikeDataConfigurationSupport {
     protected void configureDataSettings(AerospikeDataSettings.AerospikeDataSettingsBuilder builder) {
         builder.scansEnabled(false);
         builder.sendKey(true);
+        builder.createIndexesOnStartup(isCreateIndexesOnStartup());
     }
 
     protected ClientPolicy getClientPolicy() {

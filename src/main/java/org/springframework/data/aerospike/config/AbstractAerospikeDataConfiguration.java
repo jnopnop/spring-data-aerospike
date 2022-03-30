@@ -22,6 +22,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.aerospike.convert.MappingAerospikeConverter;
 import org.springframework.data.aerospike.core.AerospikeExceptionTranslator;
 import org.springframework.data.aerospike.core.AerospikeTemplate;
+import org.springframework.data.aerospike.index.AerospikeIndexResolver;
 import org.springframework.data.aerospike.index.AerospikePersistenceEntityIndexCreator;
 import org.springframework.data.aerospike.mapping.AerospikeMappingContext;
 import org.springframework.data.aerospike.query.FilterExpressionsBuilder;
@@ -55,9 +56,9 @@ public abstract class AbstractAerospikeDataConfiguration extends AerospikeDataCo
     }
 
     @Bean
-    public AerospikePersistenceEntityIndexCreator aerospikePersistenceEntityIndexCreator(AerospikeMappingContext aerospikeMappingContext,
+    public AerospikePersistenceEntityIndexCreator aerospikePersistenceEntityIndexCreator(AerospikeIndexResolver aerospikeIndexResolver,
                                                                                          @Lazy AerospikeTemplate template) {
-        return new AerospikePersistenceEntityIndexCreator(aerospikeMappingContext, template);
+        return new AerospikePersistenceEntityIndexCreator(aerospikeDataSettings().isCreateIndexesOnStartup(), aerospikeIndexResolver, template);
     }
 
     @Bean(name = "aerospikeIndexRefresher")

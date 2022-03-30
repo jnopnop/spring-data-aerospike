@@ -15,7 +15,7 @@
     <logger name="org.springframework.data.aerospike" level="DEBUG" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
-    <logger name="com.playtika.test.aerospike.EmbeddedAerospikeBootstrapConfiguration" level="DEBUG" additivity="false">
+    <logger name="com.playtika.test.aerospike.EmbeddedAerospikeBootstrapConfiguration" level="WARN" additivity="false">
         <appender-ref ref="aerospike"/>
     </logger>
 </configuration>

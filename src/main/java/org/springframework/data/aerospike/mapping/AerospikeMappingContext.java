@@ -40,7 +40,6 @@ public class AerospikeMappingContext extends
 
 	private FieldNamingStrategy fieldNamingStrategy = DEFAULT_NAMING_STRATEGY;
 	private ApplicationContext context;
-	private boolean createIndexesOnStartup;
 
 	/**
 	 * Configures the {@link FieldNamingStrategy} to be used to determine the field name if no manual mapping is applied.
@@ -73,17 +72,4 @@ public class AerospikeMappingContext extends
 		this.context = applicationContext;
 	}
 
-	public void setCreateIndexesOnStartup(boolean createIndexesOnStartup) {
-		this.createIndexesOnStartup = createIndexesOnStartup;
-	}
-
-	public boolean isCreateIndexesOnStartup() {
-		return createIndexesOnStartup;
-	}
-
-	public void setAerospikeIndexResolverEnvironment(AerospikeIndexResolver aerospikeIndexResolver) {
-		if (context != null) {
-			aerospikeIndexResolver.setEnvironment(context.getEnvironment());
-		}
-	}
 }
