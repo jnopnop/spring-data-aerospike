@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.aerospike.IndexAlreadyExistsException;
 import org.springframework.data.aerospike.core.AerospikeTemplate;
@@ -16,16 +17,17 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-@ExtendWith(MockitoExtension.class)
 class AerospikePersistenceEntityIndexCreatorTest {
 
-    @Mock
-    AerospikeTemplate template;
+    boolean createIndexesOnStartup = true;
+    AerospikeIndexResolver aerospikeIndexResolver = mock(AerospikeIndexResolver.class);
+    AerospikeTemplate template = mock(AerospikeTemplate.class);
 
-    @InjectMocks
-    AerospikePersistenceEntityIndexCreator creator;
+    AerospikePersistenceEntityIndexCreator creator =
+            new AerospikePersistenceEntityIndexCreator(null, createIndexesOnStartup, aerospikeIndexResolver, template);
 
     String name = "someName";
     String fieldName = "fieldName";

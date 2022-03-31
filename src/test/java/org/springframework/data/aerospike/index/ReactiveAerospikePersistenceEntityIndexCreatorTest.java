@@ -16,16 +16,17 @@ import java.util.Collections;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 class ReactiveAerospikePersistenceEntityIndexCreatorTest {
 
-    @Mock
-    ReactiveAerospikeTemplate template;
+    boolean createIndexesOnStartup = true;
+    AerospikeIndexResolver aerospikeIndexResolver = mock(AerospikeIndexResolver.class);
+    ReactiveAerospikeTemplate template = mock(ReactiveAerospikeTemplate.class);
 
-    @InjectMocks
-    ReactiveAerospikePersistenceEntityIndexCreator creator;
+    ReactiveAerospikePersistenceEntityIndexCreator creator =
+            new ReactiveAerospikePersistenceEntityIndexCreator(null, createIndexesOnStartup, aerospikeIndexResolver, template);
 
     String name = "someName";
     String fieldName = "fieldName";

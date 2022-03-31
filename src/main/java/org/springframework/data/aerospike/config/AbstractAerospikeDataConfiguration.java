@@ -16,12 +16,14 @@
 package org.springframework.data.aerospike.config;
 
 import com.aerospike.client.IAerospikeClient;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.aerospike.convert.MappingAerospikeConverter;
 import org.springframework.data.aerospike.core.AerospikeExceptionTranslator;
 import org.springframework.data.aerospike.core.AerospikeTemplate;
+import org.springframework.data.aerospike.index.AerospikeIndexResolver;
 import org.springframework.data.aerospike.index.AerospikePersistenceEntityIndexCreator;
 import org.springframework.data.aerospike.mapping.AerospikeMappingContext;
 import org.springframework.data.aerospike.query.FilterExpressionsBuilder;
@@ -55,9 +57,10 @@ public abstract class AbstractAerospikeDataConfiguration extends AerospikeDataCo
     }
 
     @Bean
-    public AerospikePersistenceEntityIndexCreator aerospikePersistenceEntityIndexCreator(AerospikeMappingContext aerospikeMappingContext,
+    public AerospikePersistenceEntityIndexCreator aerospikePersistenceEntityIndexCreator(ObjectProvider<AerospikeMappingContext> aerospikeMappingContext,
+                                                                                         AerospikeIndexResolver aerospikeIndexResolver,
                                                                                          @Lazy AerospikeTemplate template) {
-        return new AerospikePersistenceEntityIndexCreator(aerospikeMappingContext, template);
+        return new AerospikePersistenceEntityIndexCreator(aerospikeMappingContext, aerospikeDataSettings().isCreateIndexesOnStartup(), aerospikeIndexResolver, template);
     }
 
     @Bean(name = "aerospikeIndexRefresher")
